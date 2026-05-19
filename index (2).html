@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SHOHONA SMM Agent</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:#f0f7f2;color:#1a1a1a;display:flex}
+.app{display:flex;height:100vh;width:100%;overflow:hidden}
+.sidebar{width:260px;background:white;border-right:1px solid #e8f0e8;display:flex;flex-direction:column;height:100vh;flex-shrink:0}
+.sidebar-logo{padding:16px 14px 12px;border-bottom:1px solid #f0f0f0}
+.logo-row{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.logo-icon{width:38px;height:38px;border-radius:50%;background:#1a7a3c;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:13px;flex-shrink:0}
+.logo-name{font-size:14px;font-weight:800}
+.logo-sub{font-size:11px;color:#888}
+.day-pill{background:#e8f5e9;color:#1a7a3c;font-size:11px;font-weight:600;padding:2px 10px;border-radius:20px;display:inline-block;margin-top:4px}
+.sidebar-scroll{flex:1;overflow-y:auto;padding:4px}
+.sidebar-scroll::-webkit-scrollbar{width:3px}
+.sidebar-scroll::-webkit-scrollbar-thumb{background:#c8e6c9;border-radius:3px}
+.s-section{padding:10px 8px 3px;font-size:10px;font-weight:700;color:#bbb;text-transform:uppercase;letter-spacing:0.8px}
+.s-btn{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:12.5px;color:#444;font-weight:500;margin-bottom:1px;transition:all 0.12s}
+.s-btn:hover{background:#f0f8f2;color:#1a7a3c}
+.s-btn .ic{font-size:15px;width:20px;text-align:center}
+.s-divider{border:none;border-top:1px solid #f0f0f0;margin:6px 8px}
+.api-box{margin:8px;padding:10px 12px;background:#f9fdf9;border-radius:10px;border:1.5px solid #c8e6c9;flex-shrink:0}
+.api-label{font-size:11px;font-weight:700;color:#1a7a3c;margin-bottom:6px}
+.api-box input{width:100%;padding:7px 10px;border:1.5px solid #e0e0e0;border-radius:7px;font-size:11px;font-family:monospace;outline:none;background:white;margin-bottom:5px}
+.api-box input:focus{border-color:#1a7a3c}
+.api-save{width:100%;background:#1a7a3c;color:white;border:none;padding:7px;border-radius:7px;font-size:12px;cursor:pointer;font-weight:600}
+.api-save:hover{background:#15632f}
+.api-status{font-size:10px;color:#aaa;margin-top:4px;text-align:center}
+.main{flex:1;display:flex;flex-direction:column;height:100vh;overflow:hidden;min-width:0}
+.topbar{background:white;border-bottom:1px solid #e8f0e8;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.topbar-title{font-size:15px;font-weight:700}
+.topbar-sub{font-size:12px;color:#888;margin-top:1px}
+.stats{display:flex;gap:14px}
+.stat-n{font-size:14px;font-weight:700;color:#1a7a3c;text-align:center}
+.stat-l{font-size:10px;color:#aaa;text-align:center}
+.chat{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.chat::-webkit-scrollbar{width:4px}
+.chat::-webkit-scrollbar-thumb{background:#c8e6c9;border-radius:4px}
+.msg{display:flex;gap:9px;max-width:88%}
+.msg.user{align-self:flex-end;flex-direction:row-reverse}
+.avatar{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.msg.agent .avatar{background:#1a7a3c;color:white}
+.msg.user .avatar{background:#e8f5e9;color:#1a7a3c}
+.bubble{padding:10px 13px;border-radius:13px;font-size:13px;line-height:1.65;white-space:pre-wrap;word-break:break-word}
+.msg.agent .bubble{background:white;border:1px solid #e8f0e8;border-radius:3px 13px 13px 13px}
+.msg.user .bubble{background:#1a7a3c;color:white;border-radius:13px 3px 13px 13px}
+.msg-img{max-width:180px;border-radius:9px;margin-bottom:5px;display:block}
+.msg-actions{display:flex;gap:6px;align-items:center;margin-top:5px;flex-wrap:wrap}
+.copy-btn{font-size:11px;color:#aaa;cursor:pointer;padding:2px 7px;border-radius:5px}
+.copy-btn:hover{background:#f0f8f2;color:#1a7a3c}
+.tg-btn{font-size:11px;color:#0088cc;cursor:pointer;padding:2px 8px;border-radius:5px;border:1px solid #0088cc;background:transparent;display:inline-flex;align-items:center;gap:3px;transition:all 0.12s}
+.tg-btn:hover{background:#0088cc;color:white}
+.tg-btn.sent{color:#1a7a3c;border-color:#1a7a3c}
+.msg-time{font-size:10px;color:#ccc}
+.typing{display:flex;align-items:center;gap:5px;padding:10px 13px;background:white;border:1px solid #e8f0e8;border-radius:3px 13px 13px 13px;width:fit-content}
+.dot{width:6px;height:6px;background:#c8e6c9;border-radius:50%;animation:bounce 1.2s infinite}
+.dot:nth-child(2){animation-delay:0.2s}
+.dot:nth-child(3){animation-delay:0.4s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+.quick-bar{background:white;border-top:1px solid #e8f0e8;padding:8px 14px;flex-shrink:0}
+.quick-label{font-size:10px;font-weight:700;color:#bbb;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px}
+.quick-btns{display:flex;gap:6px;flex-wrap:wrap}
+.qbtn{padding:6px 12px;border-radius:18px;border:1.5px solid #e0e0e0;font-size:12px;cursor:pointer;background:white;color:#444;font-weight:500;transition:all 0.12s;white-space:nowrap}
+.qbtn:hover{border-color:#1a7a3c;color:#1a7a3c;background:#f0f8f2}
+.qbtn.green{background:#1a7a3c;color:white;border-color:#1a7a3c}
+.qbtn:disabled{opacity:0.4;cursor:not-allowed}
+.input-wrap{background:white;border-top:1px solid #e8f0e8;padding:10px 14px;flex-shrink:0}
+.img-preview{display:none;margin-bottom:8px;position:relative;width:fit-content}
+.img-preview img{max-height:70px;border-radius:8px;border:1.5px solid #c8e6c9}
+.img-remove{position:absolute;top:-6px;right:-6px;background:#e74c3c;color:white;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;font-weight:700}
+.input-row{display:flex;gap:7px;align-items:flex-end}
+.img-btn{width:40px;height:40px;border-radius:11px;background:#f0f8f2;border:1.5px solid #c8e6c9;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:17px}
+.img-btn:hover{background:#e8f5e9}
+.chat-input{flex:1;padding:10px 13px;border:1.5px solid #e0e0e0;border-radius:11px;font-size:13.5px;outline:none;resize:none;font-family:inherit;max-height:110px;min-height:40px;line-height:1.5}
+.chat-input:focus{border-color:#1a7a3c}
+.send-btn{width:40px;height:40px;border-radius:11px;background:#1a7a3c;color:white;border:none;cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.send-btn:hover{background:#15632f}
+.send-btn:disabled{background:#a5d6a7;cursor:not-allowed}
+.input-hint{font-size:10.5px;color:#bbb;margin-top:4px}
+.welcome{text-align:center;padding:36px 20px;color:#aaa;margin:auto}
+.welcome-icon{font-size:44px;margin-bottom:10px}
+.welcome h3{font-size:15px;font-weight:600;color:#444;margin-bottom:7px}
+.welcome p{font-size:12.5px;line-height:1.6}
+.chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:14px}
+.chip{padding:6px 13px;border-radius:18px;border:1.5px solid #e0e0e0;font-size:12px;cursor:pointer;background:white;color:#444;transition:all 0.12s}
+.chip:hover{border-color:#1a7a3c;color:#1a7a3c;background:#f0f8f2}
+.notify{position:fixed;top:14px;right:14px;background:#1a7a3c;color:white;padding:9px 16px;border-radius:9px;font-size:12.5px;font-weight:600;z-index:999;display:none;animation:slidein 0.25s ease}
+@keyframes slidein{from{transform:translateX(110%);opacity:0}to{transform:translateX(0);opacity:1}}
+</style>
+</head>
+<body>
+<div class="notify" id="notify"></div>
+<div class="app">
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-row">
+      <div class="logo-icon">SH</div>
+      <div><div class="logo-name">SHOHONA</div><div class="logo-sub">@shohona_taom · SMM Agent</div></div>
+    </div>
+    <div class="day-pill" id="day-pill">—</div>
+  </div>
+  <div class="sidebar-scroll">
+    <div class="s-section">Tez amallar</div>
+    <div class="s-btn" onclick="qa('bugun')"><span class="ic">🎯</span>Bugun uchun content</div>
+    <div class="s-btn" onclick="qa('post')"><span class="ic">✍️</span>Post caption</div>
+    <div class="s-btn" onclick="qa('story')"><span class="ic">📱</span>Story</div>
+    <div class="s-btn" onclick="qa('aksiya')"><span class="ic">🏷️</span>Aksiya e'lon</div>
+    <div class="s-btn" onclick="qa('mahsulot')"><span class="ic">📦</span>Mahsulot tavsifi</div>
+    <div class="s-btn" onclick="qa('hashtag')"><span class="ic">#️⃣</span>Hashtag</div>
+    <div class="s-btn" onclick="qa('javob')"><span class="ic">💬</span>Mijoz javoblari</div>
+    <div class="s-btn" onclick="qa('video')"><span class="ic">🎬</span>Video prompt</div>
+    <div class="s-divider"></div>
+    <div class="s-section">Strategiya</div>
+    <div class="s-btn" onclick="qa('oylik')"><span class="ic">📅</span>Oylik content plan</div>
+    <div class="s-btn" onclick="qa('bio')"><span class="ic">👤</span>Bio optimizatsiya</div>
+    <div class="s-btn" onclick="qa('trend')"><span class="ic">🔥</span>Trend g'oyalar</div>
+    <div class="s-btn" onclick="qa('raqobat')"><span class="ic">🎯</span>Raqobatchilar tahlili</div>
+    <div class="s-btn" onclick="qa('highlight')"><span class="ic">⭐</span>Highlight tavsif</div>
+    <div class="s-btn" onclick="qa('dm')"><span class="ic">📨</span>DM shablonlari</div>
+    <div class="s-btn" onclick="qa('analytics')"><span class="ic">📊</span>Analytics maslahat</div>
+    <div class="s-btn" onclick="qa('schedule')"><span class="ic">🗓️</span>Post scheduling</div>
+    <div class="s-btn" onclick="qa('bayram')"><span class="ic">🎁</span>Maxsus kunlar</div>
+    <div class="s-divider"></div>
+    <div class="s-btn" onclick="clearChat()" style="color:#c0392b"><span class="ic">🗑️</span>Chatni tozalash</div>
+  </div>
+  <div class="api-box">
+    <div class="api-label">🔑 Claude API Key</div>
+    <input type="password" id="akey" placeholder="sk-ant-api03-..."/>
+    <button class="api-save" onclick="saveKey()">💾 Saqlash</button>
+    <div class="api-status" id="astatus">Kiritilmagan</div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title">SHOHONA SMM Agent</div>
+      <div class="topbar-sub">Har qanday SMM savolingizga professional javob</div>
+    </div>
+    <div class="stats">
+      <div><div class="stat-n">7,405</div><div class="stat-l">Followers</div></div>
+      <div><div class="stat-n">188</div><div class="stat-l">Posts</div></div>
+      <div><div class="stat-n">17</div><div class="stat-l">Mahsulot</div></div>
+      <div><div class="stat-n" id="today-num">—</div><div class="stat-l">Bugun</div></div>
+    </div>
+  </div>
+  <div class="chat" id="chat"></div>
+  <div class="quick-bar">
+    <div class="quick-label">Tez amallar</div>
+    <div class="quick-btns">
+      <button class="qbtn green" onclick="qa('bugun')">🎯 Bugun</button>
+      <button class="qbtn" onclick="qa('post')">✍️ Post</button>
+      <button class="qbtn" onclick="qa('story')">📱 Story</button>
+      <button class="qbtn" onclick="qa('aksiya')">🏷️ Aksiya</button>
+      <button class="qbtn" onclick="qa('hashtag')">#️⃣ Hashtag</button>
+      <button class="qbtn" onclick="qa('javob')">💬 Mijoz javob</button>
+      <button class="qbtn" onclick="qa('video')">🎬 Video prompt</button>
+      <button class="qbtn" onclick="qa('oylik')">📅 Oylik plan</button>
+      <button class="qbtn" onclick="qa('trend')">🔥 Trend</button>
+      <button class="qbtn" onclick="qa('bio')">👤 Bio</button>
+    </div>
+  </div>
+  <div class="input-wrap">
+    <div class="img-preview" id="img-preview">
+      <img id="img-thumb" src=""/>
+      <div class="img-remove" onclick="removeImg()">✕</div>
+    </div>
+    <div class="input-row">
+      <label class="img-btn" for="img-input" title="Rasm yuklash">📸</label>
+      <input type="file" id="img-input" accept="image/*" style="display:none" onchange="handleImg(this)"/>
+      <textarea class="chat-input" id="cinput" placeholder="SMM bo'yicha savol yozing yoki 📸 rasm yuklang..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+      <button class="send-btn" id="sendbtn" onclick="sendMsg()">➤</button>
+    </div>
+    <div class="input-hint">Enter — yuborish · Shift+Enter — yangi qator · 📸 — rasm yuklash</div>
+  </div>
+</div>
+</div>
+
+<script>
+var hist=[], busy=false;
+var apiKey=localStorage.getItem('sh_akey')||'';
+var imgData=null, imgMime=null;
+var TG='https://empty-surf-74d0.farruh-uzb.workers.dev';
+var DAYS=['Yakshanba','Dushanba','Seshanba','Chorshanba','Payshanba','Juma','Shanba'];
+var MONTHS=['Yanvar','Fevral','Mart','Aprel','May','Iyun','Iyul','Avgust','Sentabr','Oktabr','Noyabr','Dekabr'];
+
+var CTX=`Sen SHOHONA brendining professional SMM mutaxassisisan.
+BREND: SHOHONA — "Halal and Excellent" | @shohona_taom | 010-5586-1916 | bit.ly/4qAoFui | Koreya, Hwaseong-si
+AUDITORIYA: Koreyadagi o'zbeklar, markaziy osiyoliklar, ruslar
+MAHSULOTLAR: Palov ₩5,650 | Uyg'ur Lag'mon ₩6,950 | Qozon Kabob ₩8,250 | Dolma ₩5,750 | Dimlama ₩5,000 | Mastava ₩4,000 | Sho'rva ₩4,000 | Nuxatshurak ₩3,950 | Moshkichiri ₩3,950 | Grechka ₩3,950 | Spagetti ₩4,400 | Biryani ₩5,250 | Tovuq kari ₩5,000 | Mol tushenka ₩5,800 | Qo'y tushenka ₩6,500 | Tovuq tushenka ₩4,600 | Non ₩4,750
+XUSUSIYATLAR: 100% Halol, Konservantsiz, 3 daqiqada tayyor, Made in Korea
+CONTENT: Haftada 3 post (Seshanba, Payshanba, Juma) + har kuni story | 18:00 eng yaxshi vaqt | O'zbek+Rus ikki tilda | CTA: 010-5586-1916 va bit.ly/4qAoFui | 20-30 hashtag
+QOIDALAR: Professional SMM mutaxassis sifatida javob ber. O'zbek va Rus tilida yoz. Emoji ishlatishni unutma. Caption so'ralsa caption+hashtag+CTA birga yoz.`;
+
+var QP={
+  bugun:function(){var d=new Date().getDay();var p={0:'Yakshanba: xayrli tun story',1:'Dushanba: motivatsion story',2:'Seshanba: Hero mahsulot Reels (POST 1)',3:'Chorshanba: mahsulot story',4:'Payshanba: mijoz fikri post (POST 2)',5:'Juma: mahsulot post (POST 3)',6:'Shanba: yetkazib berish story'};var pr=["Palov","Uyg'ur Lag'mon","Dolma","Qozon Kabob","Dimlama"];return 'Bugun '+DAYS[d]+' ('+p[d]+'). Tayyorla:\n1. Story caption (O\'zbek+Rus)\n2. '+(d===2||d===4||d===5?'Post caption (O\'zbek+Rus, emoji, CTA, hashtag)':'Content maslahat')+'\n3. Video prompt\nTavsiya: '+pr[d%pr.length];},
+  post:'Qaysi mahsulot uchun post kerak va qanday uslubda?',
+  story:'Qaysi turdagi story kerak?',
+  aksiya:'Aksiya e\'lon: qaysi mahsulot va qanday aksiya?',
+  mahsulot:'Qaysi mahsulot tavsifi kerak?',
+  hashtag:'Qaysi mahsulot uchun hashtag kerak?',
+  javob:'Mijoz kommentiga javob: savolni yozing.',
+  video:'Video prompt: qaysi mahsulot, qaysi tool, format?',
+  oylik:function(){return 'Shohona uchun '+MONTHS[new Date().getMonth()]+' oyi oylik content plan tuz.';},
+  bio:'Shohona Instagram bio ni optimallashtir.',
+  trend:'Shohona uchun 5-7 ta yangi trend content g\'oyasi ber.',
+  raqobat:'Raqobatchilar tahlili: Shohona nimalarga e\'tibor berishi kerak?',
+  highlight:'Highlight tavsiflar: NARX, MENYU, BUYURTMA, MIJOZLAR, SAVOL-JAVOB, AKSIYA.',
+  dm:'DM javob shablonlar: narx, yetkazish, buyurtma, halolmi.',
+  analytics:'Qaysi turdagi postlar Shohona uchun eng yaxshi ishlaydi?',
+  schedule:'2 haftalik post scheduling jadvali tuz.',
+  bayram:'2025-2026 muhim maxsus kunlar va content g\'oyalari.'
+};
+
+function saveKey(){var k=document.getElementById('akey').value.trim();if(!k){ntf('API key kiriting!');return;}apiKey=k;localStorage.setItem('sh_akey',k);document.getElementById('astatus').textContent='✅ Faol';document.getElementById('astatus').style.color='#1a7a3c';ntf('✅ API key saqlandi!');}
+function handleImg(i){var f=i.files[0];if(!f)return;var r=new FileReader();r.onload=function(e){imgData=e.target.result.split(',')[1];imgMime=e.target.result.split(';')[0].split(':')[1];document.getElementById('img-thumb').src=e.target.result;document.getElementById('img-preview').style.display='block';};r.readAsDataURL(f);i.value='';}
+function removeImg(){imgData=null;imgMime=null;document.getElementById('img-preview').style.display='none';document.getElementById('img-thumb').src='';}
+async function sendTG(text,btn){if(btn){btn.textContent='⏳';btn.disabled=true;}try{var c=text.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>');var r=await fetch(TG,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:c})});if(r.ok){if(btn){btn.textContent='✅';btn.className='tg-btn sent';}ntf('✅ Telegramga yuborildi!');setTimeout(function(){if(btn){btn.textContent='📤 TG';btn.className='tg-btn';btn.disabled=false;}},3000);}else{throw new Error('x');}}catch(e){if(btn){btn.textContent='❌';btn.disabled=false;}ntf('❌ Xatolik');setTimeout(function(){if(btn){btn.textContent='📤 TG';btn.className='tg-btn';}},2000);}}
+function ntf(m){var n=document.getElementById('notify');n.textContent=m;n.style.display='block';setTimeout(function(){n.style.display='none';},2500);}
+function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,110)+'px';}
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
+function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function gtime(){return new Date().toLocaleTimeString('uz-UZ',{hour:'2-digit',minute:'2-digit'});}
+
+function addMsg(content,role,thumb){
+  var chat=document.getElementById('chat');
+  var w=chat.querySelector('.welcome');if(w)w.remove();
+  var div=document.createElement('div');div.className='msg '+role;
+  var t=gtime();
+  if(role==='agent'){
+    div.innerHTML='<div class="avatar">AI</div><div>'+(thumb?'<img class="msg-img" src="'+thumb+'"/>':'')+'<div class="bubble">'+esc(content)+'</div><div class="msg-actions"><span class="copy-btn" onclick="cpMsg(this)">📋 Nusxa</span><button class="tg-btn" onclick="sendTG(this.closest(\'.msg\').querySelector(\'.bubble\').textContent,this)">📤 TG</button><button class="tg-btn" style="border-color:#1a7a3c;color:#1a7a3c" onclick="makeStory(this.closest(\'.msg\').querySelector(\'.bubble\').textContent)">🖼️ Story</button><span class="msg-time">'+t+'</span></div></div>';
+  }else{
+    div.innerHTML='<div class="avatar">S</div><div>'+(thumb?'<img class="msg-img" src="'+thumb+'"/>':'')+'<div class="bubble">'+esc(content)+'</div><div style="text-align:right"><span class="msg-time">'+t+'</span></div></div>';
+  }
+  chat.appendChild(div);chat.scrollTop=chat.scrollHeight;
+}
+
+function addTyping(){var chat=document.getElementById('chat');var d=document.createElement('div');d.className='msg agent';d.id='typ';d.innerHTML='<div class="avatar">AI</div><div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';chat.appendChild(d);chat.scrollTop=chat.scrollHeight;}
+function remTyping(){var t=document.getElementById('typ');if(t)t.remove();}
+function cpMsg(btn){var b=btn.closest('.msg-actions').previousElementSibling;navigator.clipboard.writeText(b.textContent).then(function(){btn.textContent='✅ Nusxa olindi';setTimeout(function(){btn.textContent='📋 Nusxa';},2000);});}
+
+async function sendMsg(){
+  if(busy)return;
+  var inp=document.getElementById('cinput'),msg=inp.value.trim();
+  if(!msg&&!imgData)return;
+  var disp=msg||(imgData?'📸 Rasm yuborildi':'');
+  inp.value='';inp.style.height='auto';
+  var thumb=imgData?document.getElementById('img-thumb').src:null;
+  addMsg(disp,'user',thumb);
+  var mc;
+  if(imgData){mc=[{type:'image',source:{type:'base64',media_type:imgMime,data:imgData}},{type:'text',text:msg||"Bu rasm haqida SMM maslahat ber. Caption, hashtag va reklama matni yoz (O'zbek+Rus)."}];removeImg();}
+  else{mc=msg;}
+  hist.push({role:'user',content:mc});
+  await proc();
+}
+
+async function qa(type){
+  if(busy)return;
+  var p=QP[type];if(typeof p==='function')p=p();if(!p)return;
+  addMsg(p,'user');hist.push({role:'user',content:p});await proc();
+}
+
+async function proc(){
+  busy=true;document.getElementById('sendbtn').disabled=true;
+  document.querySelectorAll('.qbtn').forEach(function(b){b.disabled=true;});
+  addTyping();
+  var res=await callAI(hist.slice(-12));
+  remTyping();
+  if(!res)res="Kechirasiz, xatolik yuz berdi. Qayta urinib ko'ring.";
+  addMsg(res,'agent');hist.push({role:'assistant',content:res});
+  busy=false;document.getElementById('sendbtn').disabled=false;
+  document.querySelectorAll('.qbtn').forEach(function(b){b.disabled=false;});
+}
+
+async function callAI(messages){
+  if(!apiKey)return'API key kiritilmagan. Chap pastdagi maydonga kiriting va 💾 Saqlash bosing.';
+  try{
+    var r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:2000,system:CTX,messages:messages})});
+    var d=await r.json();
+    if(d.error)return'Xatolik: '+d.error.message;
+    return d.content&&d.content[0]?d.content[0].text:null;
+  }catch(e){return null;}
+}
+
+function clearChat(){if(confirm('Chatni tozalashni xohlaysizmi?')){hist=[];document.getElementById('chat').innerHTML='<div class="welcome"><div class="welcome-icon">🤖</div><h3>SHOHONA SMM Agentga xush kelibsiz!</h3><p>Professional SMM yordamchingiz.<br>Chap pastdan API key kiriting va boshlang!</p><div class="chips"><span class="chip" onclick="qa(\'bugun\')">🎯 Bugungi content</span><span class="chip" onclick="qa(\'oylik\')">📅 Oylik plan</span><span class="chip" onclick="qa(\'trend\')">🔥 Trendlar</span><span class="chip" onclick="qa(\'bio\')">👤 Bio</span><span class="chip" onclick="qa(\'dm\')">📨 DM shablonlar</span><span class="chip" onclick="qa(\'hashtag\')">#️⃣ Hashtag</span></div></div>';}}
+
+function makeStory(text){
+  var clean=text.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>');
+  var c=document.createElement('canvas');
+  c.width=1080;c.height=1920;
+  var ctx=c.getContext('2d');
+
+  // Yashil gradient fon
+  var grad=ctx.createLinearGradient(0,0,0,1920);
+  grad.addColorStop(0,'#0d5c2e');
+  grad.addColorStop(0.5,'#1a7a3c');
+  grad.addColorStop(1,'#0d5c2e');
+  ctx.fillStyle=grad;
+  ctx.fillRect(0,0,1080,1920);
+
+  // Dekorativ doiralar
+  ctx.beginPath();ctx.arc(0,0,400,0,Math.PI*2);
+  ctx.fillStyle='rgba(255,255,255,0.04)';ctx.fill();
+  ctx.beginPath();ctx.arc(1080,1920,500,0,Math.PI*2);
+  ctx.fillStyle='rgba(255,255,255,0.04)';ctx.fill();
+  ctx.beginPath();ctx.arc(540,960,600,0,Math.PI*2);
+  ctx.strokeStyle='rgba(255,255,255,0.06)';ctx.lineWidth=2;ctx.stroke();
+
+  // Logo yuqorida
+  ctx.fillStyle='rgba(255,255,255,0.15)';
+  ctx.beginPath();
+  ctx.roundRect(390,80,300,80,40);
+  ctx.fill();
+  ctx.fillStyle='white';
+  ctx.font='bold 36px Arial';
+  ctx.textAlign='center';
+  ctx.fillText('SHOHONA',540,133);
+
+  // Halol belgisi
+  ctx.fillStyle='rgba(255,255,255,0.1)';
+  ctx.beginPath();ctx.roundRect(440,180,200,50,25);ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,0.8)';
+  ctx.font='22px Arial';
+  ctx.fillText('✅ 100% Halol',540,213);
+
+  // Matn
+  ctx.fillStyle='white';
+  ctx.textAlign='center';
+  var lines=clean.split('\n');
+  var y=400;
+  var lineH=58;
+  lines.forEach(function(line){
+    if(!line.trim()){y+=lineH*0.5;return;}
+    // Uzoq qatorlarni ajratish
+    var words=line.split(' ');
+    var cur='';
+    var wrapped=[];
+    words.forEach(function(w){
+      var test=cur?cur+' '+w:w;
+      ctx.font=test.startsWith('*')||test.includes('₩')?'bold 38px Arial':'36px Arial';
+      if(ctx.measureText(test).width>900&&cur){wrapped.push(cur);cur=w;}
+      else cur=test;
+    });
+    if(cur)wrapped.push(cur);
+    wrapped.forEach(function(wl){
+      var isBold=wl.includes('₩')||wl.startsWith('📲')||wl.startsWith('🚚')||wl.startsWith('*');
+      ctx.font=isBold?'bold 38px Arial':'36px Arial';
+      ctx.fillStyle=isBold?'#a8e6c1':'white';
+      ctx.fillText(wl,540,y);
+      y+=lineH;
+    });
+  });
+
+  // Pastki bar
+  ctx.fillStyle='rgba(0,0,0,0.3)';
+  ctx.fillRect(0,1720,1080,200);
+  ctx.fillStyle='rgba(255,255,255,0.9)';
+  ctx.font='bold 32px Arial';
+  ctx.textAlign='center';
+  ctx.fillText('📞 010-5586-1916',540,1790);
+  ctx.font='28px Arial';
+  ctx.fillStyle='rgba(255,255,255,0.7)';
+  ctx.fillText('🚚 Bepul yetkazib berish | bit.ly/4qAoFui',540,1840);
+  ctx.font='bold 26px Arial';
+  ctx.fillStyle='rgba(255,255,255,0.5)';
+  ctx.fillText('Made in Korea 🇰🇷',540,1890);
+
+  // Yuklab olish
+  var link=document.createElement('a');
+  link.download='shohona_story.png';
+  link.href=c.toDataURL('image/png');
+  link.click();
+  ntf('✅ Story rasm yuklab olindi!');
+}
+
+(function init(){
+  var now=new Date(),d=now.getDay();
+  document.getElementById('day-pill').textContent=DAYS[d]+', '+now.getDate()+' '+MONTHS[now.getMonth()];
+  document.getElementById('today-num').textContent=now.getDate()+'/'+(now.getMonth()+1);
+  if(apiKey){document.getElementById('akey').value=apiKey;document.getElementById('astatus').textContent='✅ Faol';document.getElementById('astatus').style.color='#1a7a3c';}
+  clearChat();
+})();
+</script>
+</body>
+</html>
